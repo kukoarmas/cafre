@@ -27,7 +27,7 @@ __EOF__
 
 echo "Creating filesystems"
 mkfs.vfat -n CASPER ${DEVICE}1
-mkfs.ext2 -L casper-fw ${DEVICE}2
+mkfs.ext2 -L casper-rw ${DEVICE}2
 mkfs.vfat -n EVIDENCE ${DEVICE}3
 
 echo "Mounting CAINE partition"
@@ -56,7 +56,7 @@ menu tabmsg Press TAB key to edit
 label live
   menu label START CAINE LIVE
   kernel /casper/vmlinuz
-  append file=/cdrom/preseed/custom.seed boot=casper boot=casper initrd=/casper/initrd.gz fsck.mode=skip quiet splash nonpersistent
+  append file=/cdrom/preseed/custom.seed boot=casper boot=casper initrd=/casper/initrd.gz fsck.mode=skip quiet splash nopersistent
   
 label live-persistent
   menu label START CAINE LIVE PERSISTENT

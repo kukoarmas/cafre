@@ -43,7 +43,7 @@ __EOF__
 
 ```
 mkfs.vfat -n CASPER /dev/sdb1
-mkfs.ext2 -L casper-fw /dev/sdb2
+mkfs.ext2 -L casper-rw /dev/sdb2
 mkfs.vfat -n EVIDENCE /dev/sdb3
 ```
 
@@ -100,12 +100,12 @@ label live-persistent
   append file=/cdrom/preseed/custom.seed boot=casper boot=casper initrd=/casper/initrd.gz fsck.mode=skip persistent live-media=/dev/disk/by-label/CASPER
 ```
 
-  * Y añadimos la opcion "nonpersistent" a la primera entrada que ya existia
+  * Y añadimos la opcion "nopersistent" a la primera entrada que ya existia
 
 ```
 label live
   menu label START CAINE LIVE
   kernel /casper/vmlinuz
-  append file=/cdrom/preseed/custom.seed boot=casper boot=casper initrd=/casper/initrd.gz fsck.mode=skip quiet splash nonpersistent
+  append file=/cdrom/preseed/custom.seed boot=casper boot=casper initrd=/casper/initrd.gz fsck.mode=skip quiet splash nopersistent
 ```
 
