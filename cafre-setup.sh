@@ -88,3 +88,10 @@ label memtest
   kernel /install/memtest
   append -
 __EOF__
+
+echo "Unmounting CAINE partition"
+umount /mnt
+
+echo "*********************"
+echo "CAFRE SETUP COMPLETED"
+echo "*********************"
