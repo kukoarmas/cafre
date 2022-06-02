@@ -79,6 +79,11 @@ __EOF__
 #
 # Setup a CAFRE environment on given device
 #
+# TODO:
+#   - Check we are running in CAINE 12 (for auditability)
+#   - Generate sha256 hashes for all files in /cdrom
+#   - Timestamp the previous file?
+#   - Publish the sha256sum.txt and timestamps in the repo
 function setup {
     
     DEVICE=$1
@@ -126,7 +131,7 @@ __EOF__
 
     # FIXME: Check that we are in the correct directory (assume we are in the directory containing the running cafre.sh script)
     echo "Copying cafre script to CAINE partition"
-    run_cmd "mkdir /mnt"
+    run_cmd "mkdir /mnt/cafre"
     run_cmd "cp cafre.sh /mnt/cafre"
 
     echo "Installing syslinux"
