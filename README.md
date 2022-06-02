@@ -31,7 +31,7 @@ El proceso de preparación del entorno es el siguiente
 
   * Crear las 3 particiones
 
-```
+```bash
 sfdisk /dev/sdb <<__EOF__
 ,4G,c,*
 ,4G
@@ -41,7 +41,7 @@ __EOF__
 
   * Formatear las particiones
 
-```
+```bash
 mkfs.vfat -n CASPER /dev/sdb1
 mkfs.ext2 -L casper-rw /dev/sdb2
 mkfs.vfat -n EVIDENCE /dev/sdb3
@@ -49,31 +49,31 @@ mkfs.vfat -n EVIDENCE /dev/sdb3
 
   * Montar la primera particion
 
-```
+```bash
 mount /dev/sdb1 /mnt
 ```
 
   * Copiar el entorno completo CAINE (asumiendo que esta montado en /cdrom)
 
-```
+```bash
 rsync -av /cdrom/ /mnt
 ```
 
   * Escribir MBR de syslinux en /dev/sdb
 
-```
+```bash
 dd if=/usr/lib/syslinux/mbr/mbr.bin of=/dev/sdb
 ```
 
   * Instalar syslinux
 
-```
+```bash
 syslinux -s /dev/sdb1
 ```
 
   * El paso anterior nos añade 2 nuevos ficheros al entorno readonly de CAINE:
 
-```
+```bash
 root@caine:/mnt# md5sum ldlinux.*
 bf4d919865a04949f6be15886e8259b9  ldlinux.c32
 b000dea8c16024f7aad82e14cacd3fca  ldlinux.sys
@@ -81,13 +81,13 @@ b000dea8c16024f7aad82e14cacd3fca  ldlinux.sys
 
   * Copiar la carpeta isolinux a syslinux
 
-```
+```bash
 cp -av /mnt/isolinux /mnt/syslinux
 ```
 
   * Renombrar el fichero /mnt/syslinux/isolinux.cfg a /mnt/syslinux/syslinux.cfg
 
-```
+```bash
 mv /mnt/syslinux/isolinux.cfg /mnt/syslinux/syslinux.cfg
 ```
 

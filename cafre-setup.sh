@@ -15,7 +15,12 @@ if [ "x$DEVICE" == "x" ]; then
     exit
 fi
 
+## TODO: Add a safety confirmation
+
 echo "Setting CAFRE environment in device: $DEVICE"
+
+echo "Zeroing beginning of disk $DEVICE"
+dd if=/dev/zero of=$DEVICE bs=1M count=10
 
 echo "Setting partitions..."
 sfdisk -f -W always ${DEVICE} <<__EOF__
@@ -87,6 +92,55 @@ label memtest
   menu label Memory test
   kernel /install/memtest
   append -
+__EOF__
+
+echo "Creating grub EFI config"
+cat <<__EOF__ > /mnt/media/kuko/CASPER/boot/grub/grub.cfg
+if loadfont /boot/grub/font.pf2 ; then
+	set gfxmode=auto
+	insmod efi_gop
+	insmod efi_uga
+	insmod gfxterm
+	terminal_output gfxterm
+fi
+
+set menu_color_normal=white/black
+set menu_color_highlight=black/light-gray
+set theme=/boot/grub/theme.cfg
+
+menuentry "Start CAINE" {
+	set gfxpayload=keep
+	linux	/casper/vmlinuz  file=/cdrom/preseed/custom.seed boot=casper iso-scan/filename=\${iso_path} fsck.mode=skip quiet splashi nopersistent --
+	initrd	/casper/initrd.gz
+}
+
+menuentry "Start CAINE PERSISTENT" {
+	set gfxpayload=keep
+	linux	/casper/vmlinuz  file=/cdrom/preseed/custom.seed boot=casper iso-scan/filename=\${iso_path} fsck.mode=skip quiet splash persistent live-media=/dev/disk/by-label/CASPER --
+	initrd	/casper/initrd.gz
+}
+
+menuentry "Start CAINE (Hard compatibility mode / ACPI off)" {
+	linux	/casper/vmlinuz  file=/cdrom/preseed/custom.seed boot=casper xforcevesa noveau.modeset=0 iso-scan/filename=\${iso_path} fsck.mode=skip noapic noacpi nosplash acpi=off irqpoll --
+	initrd	/casper/initrd.gz
+}
+menuentry "Start CAINE (Compatibility VESA mode)" {
+	linux	/casper/vmlinuz  file=/cdrom/preseed/custom.seed boot=casper xforcevesa b43.blacklist=yes iso-scan/filename=\${iso_path} fsck.mode=skip noapic noacpi nosplash irqpoll --
+	initrd	/casper/initrd.gz
+}
+menuentry "Start CAINE TO RAM" {
+	linux	/casper/vmlinuz  file=/cdrom/preseed/custom.seed boot=casper toram nomdmonddf nomdmonisw iso-scan/filename=\${iso_path} ramdisk_size=2048576 root=/dev/ram rw fsck.mode=skip noapic noacpi nosplash irqpoll --
+	initrd	/casper/initrd.gz
+}
+menuentry "Boot Live in debug mode" {
+  set gfxpayload=keep
+  linux /casper/vmlinuz boot=casper iso-scan/filename=\${iso_path} --
+  initrd /casper/initrd.gz
+}
+menuentry "Check the integrity of the medium" {
+	linux	/casper/vmlinuz  boot=casper integrity-check iso-scan/filename=\${iso_path} quiet splash --
+	initrd	/casper/initrd.gz
+}
 __EOF__
 
 echo "Unmounting CAINE partition"
