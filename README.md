@@ -132,16 +132,16 @@ Valid commands:
        - options: DIRECTORY The directory containing the files we want to create hashes for
        - examples: 
            cafre hashdir /evidences
-TO BE IMPLEMENTED:
    - timestamp: Generate an external signature and timestamp for the given file (with FreeTSA)
        - options: FILE The file we want to timestamp
        - examples: 
            cafre timestamp sha256sum.txt
-   - check_timestamp: Verifies a given timestamp to make sure it's correct
+   - verify_timestamp: Verifies a given timestamp to make sure it's correct
        - options: FILE The file we want to check the timestamp for
        - examples: 
-           cafre check_timestamp sha256sum.txt
+           cafre verify_timestamp sha256sum.txt
 
+TO BE IMPLEMENTED:
    - reset_rw: Reset (empty) the read/write overlay partition
        - options: NONE
        - examples: 

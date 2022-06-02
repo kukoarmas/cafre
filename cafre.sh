@@ -53,10 +53,10 @@ TO BE IMPLEMENTED:
        - options: FILE The file we want to timestamp
        - examples: 
            cafre timestamp sha256sum.txt
-   - check_timestamp: Verifies a given timestamp to make sure it's correct
+   - verify_timestamp: Verifies a given timestamp to make sure it's correct
        - options: FILE The file we want to check the timestamp for
        - examples: 
-           cafre check_timestamp sha256sum.txt
+           cafre verify_timestamp sha256sum.txt
 
    - reset_rw: Reset (empty) the read/write overlay partition
        - options: NONE
@@ -81,7 +81,6 @@ __EOF__
 #
 # TODO:
 #   - Check we are running in CAINE 12 (for auditability)
-#   - Generate sha256 hashes for all files in /cdrom
 #   - Timestamp the previous file?
 #   - Publish the sha256sum.txt and timestamps in the repo
 function setup {
@@ -261,7 +260,58 @@ function hash_dir {
         exit 1
     fi
 }
+
+#
+# Get a FreeTSA timestamp for a file
+#
+function timestamp {
+    FILE=$1
+
+    debug "timestamp: $FILE"
+    if [ ! -f $FILE ]; then
+        echo "ERROR: Invalid file $FILE"
+        exit 1
+    fi
+
+    # FIXME: Check if we have connection to the internet
+    echo "Generating timestamp with FreeTSA for file: ${FILE}"
+    openssl ts -query -data ${FILE} -no_nonce -sha512 -cert -out ${FILE}.tsq
+    curl -s -H 'Content-Type: application/timestamp-query' --data-binary "@${FILE}.tsq" https://freetsa.org/tsr -o ${FILE}.tsr
+    echo "Timestamp created in file: ${FILE}.tsr"
+}
  
+#
+# Verify a FreeTSA timestamp for a file
+#
+function verify_timestamp {
+    FILE=$1
+
+    debug "verify_timestamp: $FILE"
+    if [ ! -f $FILE ]; then
+        echo "ERROR: Invalid file $FILE"
+        exit 1
+    fi
+    if [ ! -f ${FILE}.tsr ]; then
+        echo "ERROR: No timestamp for file. We need a ${FILE}.tsr file"
+        exit 1
+    fi
+
+    echo "Downloading required certificates"
+    curl -s https://www.freetsa.org/files/tsa.crt -o /tmp/tsa.crt
+    curl -s https://www.freetsa.org/files/cacert.pem -o /tmp/cacert.pem
+
+    # FIXME: Check if we have connection to the internet
+    echo "**** Showing timestamp for file: ${FILE}"
+    openssl ts -reply -in ${FILE}.tsr -text
+    echo "**** Verifying signature"
+
+    openssl ts -verify -data ${FILE} -in ${FILE}.tsr -CAfile /tmp/cacert.pem -untrusted /tmp/tsa.crt
+    echo "***************************************************************************"
+    echo "You don't need to trust this script"
+    echo "You can manually check the timestamp following the FreeTSA documentation:"
+    echo "https://www.freetsa.org/index_en.php"
+    echo "***************************************************************************"
+}
 
 ## --------- MAIN code
 
@@ -301,6 +351,12 @@ case $CMD in
     ;;
   "hash_dir")
     hash_dir $2
+    ;;
+  "timestamp")
+    timestamp $2
+    ;;
+  "verify_timestamp")
+    verify_timestamp $2
     ;;
   *)
     echo "ERROR Invalid command: $CMD" >&2
