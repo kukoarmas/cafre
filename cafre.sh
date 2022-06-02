@@ -235,7 +235,7 @@ menuentry "Check the integrity of the medium" {
 __EOF__
 
     echo "Saving sha256 hashes of all files to sha256sum-cafre.txt"
-    run_cmd "hash_dir /mnt | grep -v sha256sum-cafre.txt" | tee /mnt/sha256sum-cafre.txt
+    run_cmd "hash_dir /mnt" | grep -v sha256sum-cafre.txt | tee /mnt/sha256sum-cafre.txt
 
     echo "Unmounting CAINE partition"
     run_cmd "umount /mnt"
