@@ -120,6 +120,7 @@ __EOF__
     run_cmd "mkfs.ext2 -L casper-rw ${DEVICE}2"
     run_cmd "mkfs.vfat -n EVIDENCE ${DEVICE}3"
 
+    # FIXME: Make sure this command succeeds before proceeding
     echo "Mounting CAINE partition"
     run_cmd "mount /dev/disk/by-label/CASPER /mnt"
 
@@ -232,6 +233,9 @@ menuentry "Check the integrity of the medium" {
 	initrd	/casper/initrd.gz
 }
 __EOF__
+
+    echo "Saving sha256 hashes of all files to sha256sum-cafre.txt"
+    run_cmd "hash_dir /mnt > /mnt/sha256sum-cafre.txt"
 
     echo "Unmounting CAINE partition"
     run_cmd "umount /mnt"
