@@ -95,7 +95,7 @@ label memtest
 __EOF__
 
 echo "Creating grub EFI config"
-cat <<__EOF__ > /mnt/media/kuko/CASPER/boot/grub/grub.cfg
+cat <<__EOF__ > /mnt/boot/grub/grub.cfg
 if loadfont /boot/grub/font.pf2 ; then
 	set gfxmode=auto
 	insmod efi_gop
