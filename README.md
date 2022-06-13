@@ -109,3 +109,49 @@ label live
   append file=/cdrom/preseed/custom.seed boot=casper boot=casper initrd=/casper/initrd.gz fsck.mode=skip quiet splash nopersistent
 ```
 
+
+## Usage
+
+Basic usage of the cafre.sh script
+
+```
+cafre.sh [-h] | command options
+
+Uso:
+  -h              : Shows this help message
+  -d              : Debug. Show debug messages
+  -n              : Do nothing. Just show what should be done
+
+Valid commands:
+
+   - setup: Setup the given device as a CAFRE boot device
+       - options: DEVICE The device we want to use. ALL INFORMATION IN THIS DEVICE WILL BE DELETED
+       - examples: 
+           cafre setup /dev/sdb
+   - hash_dir: Generate sha256 hashes for all files in the given dir (recursively)
+       - options: DIRECTORY The directory containing the files we want to create hashes for
+       - examples: 
+           cafre hashdir /evidences
+   - timestamp: Generate an external signature and timestamp for the given file (with FreeTSA)
+       - options: FILE The file we want to timestamp
+       - examples: 
+           cafre timestamp sha256sum.txt
+   - verify_timestamp: Verifies a given timestamp to make sure it's correct
+       - options: FILE The file we want to check the timestamp for
+       - examples: 
+           cafre verify_timestamp sha256sum.txt
+
+TO BE IMPLEMENTED:
+   - reset_rw: Reset (empty) the read/write overlay partition
+       - options: NONE
+       - examples: 
+           cafre reset-rw
+   - protect_rw: Protect the read/write overlay partition (changing it's label to casper-rw-protected)
+       - options: NONE
+       - examples: 
+           cafre protect_rw
+   - unprotect_rw: Unprotect the read/write overlay partition (changing it's label back to casper-rw)
+       - options: NONE
+       - examples: 
+           cafre unprotect_rw
+```
