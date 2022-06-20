@@ -124,6 +124,10 @@ Uso:
 
 Valid commands:
 
+   - info: Show basic info about CAFRE environment
+       - options: NONE
+       - examples: 
+           cafre info
    - setup: Setup the given device as a CAFRE boot device
        - options: DEVICE The device we want to use. ALL INFORMATION IN THIS DEVICE WILL BE DELETED
        - examples: 
@@ -140,13 +144,11 @@ Valid commands:
        - options: FILE The file we want to check the timestamp for
        - examples: 
            cafre verify_timestamp sha256sum.txt
-
-TO BE IMPLEMENTED:
-   - reset_rw: Reset (empty) the read/write overlay partition
+   - wipe_rw: Wipe (empty) the read/write overlay partition
        - options: NONE
        - examples: 
-           cafre reset-rw
-   - protect_rw: Protect the read/write overlay partition (changing it's label to casper-rw-protected)
+           cafre wiper_rw
+   - protect_rw: Protect the read/write overlay partition (changing it's label to casper-rw-protec)
        - options: NONE
        - examples: 
            cafre protect_rw
