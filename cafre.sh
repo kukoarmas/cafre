@@ -6,8 +6,9 @@
 CAINE_SIZE="4G"
 OVERLAY_SIZE="4G"
 
-## Code
+VERSION=0.1.1
 
+## Code
 DEVICE="$1"
 
 ## --------- Helper functions
@@ -40,6 +41,10 @@ Uso:
 
 Valid commands:
 
+   - info: Show basic info about CAFRE environment
+       - options: NONE
+       - examples: 
+           cafre info
    - setup: Setup the given device as a CAFRE boot device
        - options: DEVICE The device we want to use. ALL INFORMATION IN THIS DEVICE WILL BE DELETED
        - examples: 
@@ -48,7 +53,6 @@ Valid commands:
        - options: DIRECTORY The directory containing the files we want to create hashes for
        - examples: 
            cafre hashdir /evidences
-TO BE IMPLEMENTED:
    - timestamp: Generate an external signature and timestamp for the given file (with FreeTSA)
        - options: FILE The file we want to timestamp
        - examples: 
@@ -57,12 +61,11 @@ TO BE IMPLEMENTED:
        - options: FILE The file we want to check the timestamp for
        - examples: 
            cafre verify_timestamp sha256sum.txt
-
-   - reset_rw: Reset (empty) the read/write overlay partition
+   - wipe_rw: Wipe (empty) the read/write overlay partition
        - options: NONE
        - examples: 
-           cafre reset-rw
-   - protect_rw: Protect the read/write overlay partition (changing it's label to casper-rw-protected)
+           cafre wiper_rw
+   - protect_rw: Protect the read/write overlay partition (changing it's label to casper-rw-protec)
        - options: NONE
        - examples: 
            cafre protect_rw
@@ -74,9 +77,38 @@ TO BE IMPLEMENTED:
 __EOF__
 }
 
-## --------- Command functions
+#########################################
+######        INFO COMMAND         ######
+#########################################
 
 #
+# Show infor about CAFRE environment
+function info {
+
+    source /etc/lsb-release
+    echo "CAFRE Forensic environment version ${VERSION}"
+    echo "Running on ${DISTRIB_DESCRIPTION}"
+    echo
+    if [ -L /dev/disk/by-label/casper-rw-protec ]; then
+        echo "Persistence partition is PROTECTED"
+    elif [ -L /dev/disk/by-label/casper-rw ]; then
+        echo "Persistence partition is UNPROTECTED"
+    else
+        echo "WARNING: No persistence partition found. Are you running me in plain CAINE??"
+    fi
+    echo
+    if grep -q " persistent " /proc/cmdline; then
+        echo "RUNNING IN PERSISTENT MODE"
+    else
+        echo "Running in NON PERSISTENT mode"
+    fi
+
+} 
+
+#########################################
+######       SETUP COMMAND         ######
+#########################################
+
 # Setup a CAFRE environment on given device
 #
 # TODO:
@@ -244,6 +276,65 @@ __EOF__
     echo "*********************"
 }
 
+#########################################
+#### PERSISTENCE PARTITION HANDLING #####
+#########################################
+#
+# Protect the persistent partition (changing the label)
+#
+function protect_rw {
+
+    if [ -L /dev/disk/by-label/casper-rw ]; then
+        blockdev --setrw /dev/disk/by-label/casper-rw
+        e2label /dev/disk/by-label/casper-rw casper-rw-protec
+        blockdev --setro /dev/disk/by-label/casper-rw
+    else
+        echo "No casper-rw partition to protect"
+        exit 1
+    fi
+}
+
+#
+# Unrotect the persistent partition (changing the label)
+#
+function unprotect_rw {
+
+    if [ -L /dev/disk/by-label/casper-rw-protec ]; then
+        blockdev --setrw /dev/disk/by-label/casper-rw
+        e2label /dev/disk/by-label/casper-rw-protec casper-rw
+        blockdev --setro /dev/disk/by-label/casper-rw
+    else
+        echo "No casper-rw-protected partition to unprotect"
+        exit 1
+    fi
+}
+
+#
+# Wipe the persistent partition
+#
+function wipe_rw {
+
+    ## Safety confirmation
+    proceed="n"
+    echo "THIS ACTION WILL DESTROY ALL INFORMATION ON PERSISTENCE PARTITION"
+    read -r -p "Are you sure you want to proceed?[y/N]: " proceed
+    if [ "$proceed" != "y" ]; then
+        echo "WIPE ABORTED"
+        exit
+    fi
+ 
+    if [ -L /dev/disk/by-label/casper-rw ]; then
+        run_cmd "mkfs.ext2 -L casper-rw /dev/disk/by-label/casper-rw"
+    else
+        echo "No casper-rw partition to wipe"
+        exit 1
+    fi
+}
+
+#########################################
+###### HASH AND TIMESTAMP COMMANDS ######
+#########################################
+
 #
 # Generate sha256 hashes for all files in a given directory
 #
@@ -313,7 +404,10 @@ function verify_timestamp {
     echo "***************************************************************************"
 }
 
-## --------- MAIN code
+
+#########################################
+######             MAIN            ######
+#########################################
 
 debug=0
 do_nothing=0
@@ -348,6 +442,18 @@ CMD=$1
 case $CMD in
   "setup")
     setup $2
+    ;;
+  "info")
+    info
+    ;;
+  "protect_rw")
+    protect_rw
+    ;;
+  "unprotect_rw")
+    unprotect_rw
+    ;;
+  "wipe_rw")
+    wipe_rw
     ;;
   "hash_dir")
     hash_dir $2
