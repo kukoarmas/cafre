@@ -132,7 +132,14 @@ function setup {
         echo "SETUP ABORTED"
         exit
     fi
-    
+
+    ## Check that we are in the cafre directory
+    if [ ! -f cafre.sh ]; then
+        echo "ERROR: No cafre.sh file found in current directory"
+        echo "setup command should be run inside the cafre directory"
+        exit
+    fi
+
     echo "Setting CAFRE environment in device: $DEVICE"
     
     echo "Zeroing beginning of disk $DEVICE"
@@ -154,6 +161,11 @@ __EOF__
     # FIXME: Make sure this command succeeds before proceeding
     echo "Mounting CAINE partition"
     run_cmd "mount /dev/disk/by-label/CASPER /mnt"
+    # Check mount worked
+    if ! mount | grep -q /mnt; then
+        echo "ERROR: mount of the CASPER partition in /mnt failed"
+        exit
+    fi
 
     echo "Copying CAINE"
     run_cmd "rsync -av /cdrom/ /mnt"
