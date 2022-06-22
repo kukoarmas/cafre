@@ -144,7 +144,7 @@ This command verifies a FreeTSA signed timestamp for a given file
 It's used to verify the signature for a signed file. 
 
 ```bash
-./cafre timestamp file.txt
+./cafre verify_timestamp file.txt
 ```
 
 ## Usage
