@@ -134,12 +134,11 @@ find . -type f | xargs -d '\n' sha256sum | grep -v sha256sum-cafre.txt | tee /mn
 
   * From now on, any tampering with the live environment can be detected checking the sha256 hashes
 
-  * OPIONAL: Generate FreeTSA signed timestamp of the sha256sum-cafre.txt file.
+  * OPTIONAL: Generate FreeTSA signed timestamp of the sha256sum-cafre.txt file.
     * This way, any tampering with the hashes file will also be detected because it will break the digital signature
     * Also, the timestamp proves the exact moment when the environment was setup
 
-
-  * Unmount the device any all set!
+  * Unmount the device and all set!
 
 ```
 cd
