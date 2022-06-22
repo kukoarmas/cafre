@@ -110,7 +110,7 @@ Remember that **for the forensic acquisition process, you must use the persisten
 To wipe the persistent partition:
 
 ```bash
-./cafre protect_rw
+./cafre wipe_rw
 ```
 
 #### Hash and Timestamp management
