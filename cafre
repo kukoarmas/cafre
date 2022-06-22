@@ -358,7 +358,7 @@ function wipe_rw {
     if [ -L /dev/disk/by-label/casper-rw ]; then
         run_cmd "mkfs.ext2 -L casper-rw /dev/disk/by-label/casper-rw"
     else
-        echo "No casper-rw partition to wipe"
+        echo "No casper-rw partition to wipe. Maybe you need to unprotect it first?"
         exit 1
     fi
 }
