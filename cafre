@@ -319,7 +319,7 @@ function protect_rw {
     if [ -L /dev/disk/by-label/casper-rw ]; then
         run_cmd "blockdev --setrw /dev/disk/by-label/casper-rw"
         run_cmd "e2label /dev/disk/by-label/casper-rw casper-rw-protec"
-        run_cmd "blockdev --setro /dev/disk/by-label/casper-rw-protec"
+        run_cmd "blockdev --setro /dev/disk/by-label/casper-rw"
     else
         echo "No casper-rw partition to protect"
         exit 1
@@ -334,7 +334,7 @@ function unprotect_rw {
     if [ -L /dev/disk/by-label/casper-rw-protec ]; then
         run_cmd "blockdev --setrw /dev/disk/by-label/casper-rw-protec"
         run_cmd "e2label /dev/disk/by-label/casper-rw-protec casper-rw"
-        run_cmd "blockdev --setro /dev/disk/by-label/casper-rw"
+        run_cmd "blockdev --setro /dev/disk/by-label/casper-rw-protec"
     else
         echo "No casper-rw-protected partition to unprotect"
         exit 1
@@ -356,8 +356,9 @@ function wipe_rw {
     fi
  
     if [ -L /dev/disk/by-label/casper-rw ]; then
-        run_cmd "lockdev --setrw /dev/disk/by-label/casper-rw"
+        run_cmd "blockdev --setrw /dev/disk/by-label/casper-rw"
         run_cmd "mkfs.ext2 -L casper-rw /dev/disk/by-label/casper-rw"
+        run_cmd "blockdev --setro /dev/disk/by-label/casper-rw"
     else
         echo "No casper-rw partition to wipe. Maybe you need to unprotect it first?"
         exit 1
