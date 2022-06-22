@@ -6,7 +6,8 @@
 CAINE_SIZE="4G"
 OVERLAY_SIZE="4G"
 
-VERSION=0.1.1
+VERSION="0.1.1"
+CAINE_VERSION="CAINE 12"
 
 ## Code
 DEVICE="$1"
@@ -119,11 +120,28 @@ function setup {
     
     DEVICE=$1
 
+    # Require device to be specified
     if [ "x$DEVICE" == "x" ]; then
         echo "Please, specify the device. ALL INFORMATION ON DEVICE WILL BE DELETED"
         exit
     fi
-    
+
+    # Check that we are running inside correct CAINE version
+    source /etc/lsb-release 2>/dev/null
+    if [ "${DISTRIB_DESCRIPTION}" != "${CAINE_VERSION}" ]; then
+        echo "ERROR: It seems you are not running the cafre util inside a ${CAINE_VERSION} live environment"
+        echo "       The cafre tool is intended to be run inside a ${CAINE_VERSION} live environment"
+        exit 1
+    fi
+    # Check that casper-rw is not mounted
+    if mount | grep -q "/dev/disk/by-label/casper-rw" | grep -q "/var/log"; then
+        echo "ERROR: It seems there is a "casper-rw" partition mounted in /var/log"
+        echo "       Did you start a plain CAINE system with an already setup CAFRE device connected (without protecting the casper-rw partition)?"
+        echo "       I hope not. If you did, you just LOST ALL INFORMATION in casper-rw partition"
+        echo "       Delete or protect the partition with 'cafre protect_rw', reboot and run setup again"
+        exit 1
+    fi
+
     ## Safety confirmation
     proceed="n"
     echo "THIS ACTION WILL DESTROY ALL INFORMATION ON DEVICE ${DEVICE}"
@@ -134,8 +152,8 @@ function setup {
     fi
 
     ## Check that we are in the cafre directory
-    if [ ! -f cafre.sh ]; then
-        echo "ERROR: No cafre.sh file found in current directory"
+    if [ ! -f cafre ]; then
+        echo "ERROR: No cafre file found in current directory"
         echo "setup command should be run inside the cafre directory"
         exit
     fi
@@ -176,7 +194,7 @@ __EOF__
     # FIXME: Check that we are in the correct directory (assume we are in the directory containing the running cafre.sh script)
     echo "Copying cafre script to CAINE partition"
     run_cmd "mkdir /mnt/cafre"
-    run_cmd "cp cafre.sh /mnt/cafre"
+    run_cmd "cp cafre /mnt/cafre"
 
     echo "Installing syslinux"
     run_cmd "syslinux -s /dev/disk/by-label/CASPER"
@@ -195,12 +213,12 @@ menu tabmsg Press TAB key to edit
 label live
   menu label START CAINE LIVE
   kernel /casper/vmlinuz
-  append file=/cdrom/preseed/custom.seed boot=casper boot=casper initrd=/casper/initrd.gz fsck.mode=skip quiet splash nopersistent
+  append file=/cdrom/preseed/custom.seed boot=casper boot=casper initrd=/casper/initrd.gz fsck.mode=skip quiet splash live-media=/dev/disk/by-label/CASPER nopersistent
   
 label live-persistent
   menu label START CAINE LIVE PERSISTENT
   kernel /casper/vmlinuz
-  append file=/cdrom/preseed/custom.seed boot=casper boot=casper initrd=/casper/initrd.gz fsck.mode=skip persistent live-media=/dev/disk/by-label/CASPER
+  append file=/cdrom/preseed/custom.seed boot=casper boot=casper initrd=/casper/initrd.gz fsck.mode=skip quiet splash live-media=/dev/disk/by-label/CASPER persistent
 
 label safe graphics mode acpi off
   menu label Boot Live in safe graphics mode
@@ -244,13 +262,13 @@ set theme=/boot/grub/theme.cfg
 
 menuentry "Start CAINE" {
 	set gfxpayload=keep
-	linux	/casper/vmlinuz  file=/cdrom/preseed/custom.seed boot=casper iso-scan/filename=\${iso_path} fsck.mode=skip quiet splashi nopersistent --
+	linux	/casper/vmlinuz  file=/cdrom/preseed/custom.seed boot=casper iso-scan/filename=\${iso_path} fsck.mode=skip quiet splash live-media=/dev/disk/by-label/CASPER nopersistent --
 	initrd	/casper/initrd.gz
 }
 
 menuentry "Start CAINE PERSISTENT" {
 	set gfxpayload=keep
-	linux	/casper/vmlinuz  file=/cdrom/preseed/custom.seed boot=casper iso-scan/filename=\${iso_path} fsck.mode=skip quiet splash persistent live-media=/dev/disk/by-label/CASPER --
+	linux	/casper/vmlinuz  file=/cdrom/preseed/custom.seed boot=casper iso-scan/filename=\${iso_path} fsck.mode=skip quiet splash live-media=/dev/disk/by-label/CASPER persistent --
 	initrd	/casper/initrd.gz
 }
 
@@ -279,6 +297,9 @@ __EOF__
 
     echo "Saving sha256 hashes of all files to sha256sum-cafre.txt"
     run_cmd "hash_dir /mnt" | grep -v sha256sum-cafre.txt | tee /mnt/sha256sum-cafre.txt
+
+    echo "Geting FreeTSA signature with timestamp for sha256sum-cafre.txt"
+    run_cmd "timestamp /mnt/sha256sum-cafre.txt"
 
     echo "Unmounting CAINE partition"
     run_cmd "umount /mnt"
