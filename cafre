@@ -98,12 +98,11 @@ function info {
         echo "WARNING: No persistence partition found. Are you running me in plain CAINE??"
     fi
     echo
-    if grep -q " persistent " /proc/cmdline; then
+    if grep -q " persistent" /proc/cmdline; then
         echo "RUNNING IN PERSISTENT MODE"
     else
         echo "Running in NON PERSISTENT mode"
     fi
-
 } 
 
 #########################################
