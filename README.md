@@ -157,7 +157,7 @@ It's used to verify the signature for a signed file.
 
 Basic usage of the cafre.sh script
 
-```bash
+```
 cafre.sh [-h] | command options
 
 Uso:
