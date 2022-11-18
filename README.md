@@ -127,7 +127,7 @@ This command just generate the SHA256 hash recursively for all files in a given 
 
 The hashes are printed in standard output, so in order to have them in a file you need to redirect output
 
-```
+```bash
 ./cafre hash_dir DIRECTORY
 ```
 
@@ -157,7 +157,7 @@ It's used to verify the signature for a signed file.
 
 Basic usage of the cafre.sh script
 
-```
+```bash
 cafre.sh [-h] | command options
 
 Uso:
