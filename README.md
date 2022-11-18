@@ -16,9 +16,9 @@ The main features of the CAFRE environment are:
 
 Partitions in a device with the CAFRE environment:
 
-  * Partition 1: Boot partition. Its a base CAINE live partition that will be mounted readonly. This way this partition never changes and checking it's integrity is trivial: just check the hashes.
-  * Partition 2: Overlay persistent partition. Will be mounted over the first partition to save all changes done to the system. All actions done during the acquisition process will create artifacts in this partition (logs, created files, bash_history, etc). It is also useful to get screenshots and screen recordings during the process, all these screenshots and recordings will be stored in this partition.
-  * Partition 3: The EVIDENCE partition. It's where the acquired evidences will be stored. It will use all available disk space.
+  * **Partition 1:** Boot partition. Its a base CAINE live partition that will be mounted readonly. This way this partition never changes and checking it's integrity is trivial: just check the hashes.
+  * **Partition 2:** Overlay persistent partition. Will be mounted over the first partition to save all changes done to the system. All actions done during the acquisition process will create artifacts in this partition (logs, created files, bash_history, etc). It is also useful to get screenshots and screen recordings during the process, all these screenshots and recordings will be stored in this partition.
+  * **Partition 3:** The EVIDENCE partition. It's where the acquired evidences will be stored. It will use all available disk space.
 
 Since the default boot option does not use the persistent partition, **the device can be used to run forensic examination of itself**. Just boot with the default non persistent option, check the integrity of the readonly system, mount the persistent partition readonly, and analyze the artifacts.
 
