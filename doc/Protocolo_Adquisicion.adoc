@@ -1,0 +1,260 @@
+= Protocolo Adquisición
+Miguel Armas
+v1.0.0, {docdate}: Revisión inicial
+:doctype: book
+:title-page:
+:size: A4
+:encode: UTF-8
+:lang: es
+:sectnums:
+:imagesdir: .
+:icons: font
+:toc:
+:toc-title: Contenido
+:chapter-signifier: 
+
+== Ejemplo de proceso de adquisición
+
+=== Introducción
+
+En este capítulo se muestra un ejemplo completo de proceso de adquisición, y se indican las evidencias que quedan en el disco utilizado durante al proceso para analizar tanto el entorno como el procedimiento de adquisición de evidencias.
+
+Se asume que el perito realizará el proceso de adquisición ante un fedatario público (Notario o Letrado de la Administración de Justicia) que se encargará de dar fe de que el procedimiento de adquisición de ha realizado tal como lo describe el perito. Una vez completado el proceso de adquisición de evidencias, el disco utilizado durante el procedimiento quedará en custodia del fedatario público.
+
+=== Preparación previa
+
+Con anterioridad a la cita con el Notario para realizar la adquisición de las evidencias, el perito debe preparar el dispositivo con el sistema descrito en los capítulos anteriores.
+
+Para ello, el perito necesitará un CD o pendrive con el sistema CAINE 12.4 y un disco externo USB con capacidad suficiente para almacenar las evidencias que se pretenden adquirir. Hay que tener en cuenta que el sistema de adquisición utilizará unos 8 GB adicionales, 4GB para el sistema CAINE de sólo lectura y otros 4GB para el sistema “overlay” de lectura/escritura donde quedarán registradas las acciones realizadas por el perito.
+
+Los pasos necesarios para la preparación del disco duro externo son las siguientes:
+
+Arrancar un ordenador con el sistema CAINE en modo Live
+
+Descargar las utilidades del sistema CAFRE (usando el repositorio git) y entrar en el directorio “cafre”
+
+.Clonado repositorio Git
+image:extracted-media/media/image17.png[Texto Descripción generada automáticamente,width=528,height=194]
+
+Conectar el disco externo USB que se usará en el proceso de extracción (en este caso es el disco /dev/sdb)
+
+.Listados dispositivos
+image:extracted-media/media/image18.png[image,width=539,height=156]
+
+Ejecutar el script *cafre* indicándole el disco donde se desea instalar el entorno
+
+.Arranque proceso instalación CAFRE
+image:extracted-media/media/image19.png[Texto Descripción generada automáticamente,width=539,height=115]
+
+Una vez completado el proceso de instalación se mostrará el mensaje siguiente
+
+.Mensaje instalación correcta
+image:extracted-media/media/image20.png[Texto Descripción generada automáticamente,width=535,height=223]
+
+Verificar que se han creado las tres particiones del sistema de adquisición.
+
+.Verificación de las tres particiones del entorno
+image:extracted-media/media/image21.png[Texto Descripción generada automáticamente,width=523,height=219]
+
+Si se muestran las tres particiones con un esquema similar al mostrado, es que la instalación se ha completado correctamente.
+
+Para verificar que el sistema arranca correctamente, apagar el equipo, retirar el CD o pendrive de CAINE y arrancar el equipo desde el disco duro donde se ha instalado el entorno forense. Deberían aparecer las siguientes opciones de arranque.
+
+.Opciones de arranque CAFRE
+image:extracted-media/media/image22.png[image,width=346,height=274]
+
+La primera opción es un arranque *no persistente*, similar a la opción “live” de CAINE. La segunda opción es el arranque *persistente* en el que todos los cambios realizados sobre el sistema base CAINE se almacenan en la segunda partición (partición de “overlay”). *Para el proceso de adquisición de evidencias se debe arrancar con la opción persistente*, es decir, con la segunda opción de arranque, *de forma que quede registrada toda la actividad del sistema durante el proceso de adquisición*.
+
+Es muy importante que no se arranque en modo persistente antes del proceso de adquisición, ya que, en tal caso, el sistema tendría registrada actividad anterior al proceso de extracción lo que complicaría un análisis forense posterior del entorno. Es por esta razón por la que la opción de arranque por defecto es no persistente, para evitar contaminar el sistema accidentalmente.
+
+En cualquier caso, en caso de que se arranque el sistema con la opción persistente (accidentalmente o para probar que funciona la persistencia), para volver al estado inicial bastaría con arrancar en modo no persistente y eliminar todo el contenido de la partición de persistencia con la opción *wipe_rw* de la utilidad cafre.
+
+=== Proceso de adquisición
+
+A continuación, se describen las acciones llevadas a cabo ante el Notario para llevar a cabo la adquisición siguiendo paso a paso la metodología descrita.
+
+==== Identificación del entorno y medios
+
+Se procede a identificar el equipo objeto de la investigación. Se trata de un ordenador HP All-in-One blanco. Se solicita al Notario que la identificación y fotografía del este conste en acta.
+
+.Ordenador objeto de la investigación
+image:extracted-media/media/image23.png[Una computadora en una mesa de madera Descripción generada automáticamente con confianza media,width=483,height=378]
+
+Se localizan etiquetas con datos identificativos de marca, modelo y número de serie:
+
+.Etiquetas con datos identificativos externos
+image:extracted-media/media/image24.png[Texto Descripción generada automáticamente,width=300,height=138]image:extracted-media/media/image25.png[Texto Descripción generada automáticamente,width=192,height=138]
+
+Se obtienen los siguientes datos identificativos:
+
+* *Marca: HP*
+* *Modelo: 24 df0048ns*
+* *ID de Producto: 3A181EA#ABE*
+* *Número de serie: 8CC0481H0X*
+
+Se solicita al Notario que consten en acta estos datos y las fotografías de las etiquetas.
+
+==== Arranque desde el entorno forense
+
+Se desconecta el cable de conexión a la red y se conecta el disco con el entorno forense de arranque. Se solicita al Notario que conste en acta este hecho, y que el disco forense es el único dispositivo conectado al ordenador.
+
+.Conexión disco entorno forense
+image:extracted-media/media/image26.png[Imagen que contiene tabla, computadora Descripción generada automáticamente,width=191,height=333]
+
+Se arranca el ordenador desde el disco externo. No es necesario configurar nada en la BIOS porque estaba configurado para arrancar desde USB externo como primera opción.
+
+Entre las opciones de arranque mostradas, se selecciona el arranque persistente.
+
+.Arranque con opción persistente
+image:extracted-media/media/image27.png[Imagen que contiene electrónica Descripción generada automáticamente,width=411,height=232]
+
+Cuando se completa el proceso de arranque, se solicita al Notario que conste en acta que se ha arrancado con la opción persistente y que se ha completado el arranque del entorno forense. A partir de este momento, aparte de las fotografías tomadas con el móvil del perito e incluidas en este documento, se toman también capturas de pantalla, de forma que sea posible confirmar el procedimiento comparando las fotografías con las capturas de pantalla.
+
+.Pantalla principal del entorno forense
+image:extracted-media/media/image28.png[Imagen de la pantalla de un computador Descripción generada automáticamente con confianza baja,width=457,height=268]
+
+==== Preparación del entorno
+
+Se cambia la configuración de teclado a español (opción “_Keyboard_” en el escritorio) y se toma nota de la fecha y hora indicada por el reloj del sistema.
+
+.Fecha y hora del sistema
+image:extracted-media/media/image29.png[Imagen de la pantalla de un computador Descripción generada automáticamente con confianza baja,width=604,height=306]
+
+La hora es correcta, pero se muestra una hora más porque CAINE está configurada por defecto en la zona horaria de Italia (UTC+2, en verano) y el proceso de adquisición se está realizando en Canarias (UTC+1, en verano). Esto indica que el reloj interno del equipo está configurado en UTC y no tiene una desviación significativa con respecto a la hora real. Por lo tanto, para interpretar los timestamps que se muestren en las evidencias adquiridas sólo habrá que tener en cuenta la zona horaria del sistema operativo.
+
+Se decide continuar sin modificar la zona horaria para evitar saltos en el tiempo en los timestamps del proceso de adquisición. Sólo habrá que tener en cuenta que los timestamps de los artefactos en la partición de persistencia indicarán una hora más que la hora local a la que se hicieron.
+
+Se solicita al Notario que conste en acta que el reloj del equipo está configurado en UTC y que la hora es correcta. También, que el entorno forense está en una zona horaria con una hora de adelanto sobre la hora local.
+
+Se monta la partición de evidencias en lectura/escritura. Se muestra el estado de las particiones para mostrar que la partición de evidencias es la única montada en lectura/escritura. Se solicita al Notario que conste en acta este hecho y la fotografía:
+
+.Estado de particiones
+image:extracted-media/media/image30.png[Imagen de la pantalla de un computador Descripción generada automáticamente con confianza baja,width=404,height=257]
+
+Se obtienen datos de la configuración hardware del equipo con la utilidad hwinfo y se almacena en el fichero hwinfo.txt en el directorio home del usuario caine.
+
+Esta información permitirá relacionar la información obtenida con los elementos identificativos externos del equipo, para garantizar que la información obtenida realmente proviene de este equipo.
+
+.Obtención de datos de hardware del equipo
+image:extracted-media/media/image31.png[Imagen de la pantalla de un computador Descripción generada automáticamente con confianza baja,width=480,height=316]
+
+==== Adquisición de evidencias
+
+Se procede a obtener el volcado forense del disco interno del ordenador investigado.
+
+Se arranca la utilidad Guymager y se selecciona el disco interno que se pretende clonar.
+
+Se solicita al Notario que conste en acta la fotografía en la que se muestra el disco seleccionado:
+
+.Guymager con disco seleccionado
+image:extracted-media/media/image32.png[Pantalla de computadora Descripción generada automáticamente,width=386,height=237]
+
+Se selecciona la opción “info” para que se muestre la información detallada del disco
+
+.Información detallada del disco
+image:extracted-media/media/image33.png[Texto Descripción generada automáticamente,width=432,height=291]
+
+En la información mostrada pueden observarse los siguientes detalles identificativos del disco a adquirir:
+
+* *Marca y Modelo:* WDC PC SN530 SDBPNPZ-512G-1006
+* *Número de serie:* 20356F802673
+
+Se solicita al Notario que consten en acta estos datos y la fotografía en la que aparecen.
+
+Se selecciona la opción de “adquirir imagen” y se rellenan los datos solicitados para la adquisición:
+
+.Datos para la adquisición
+image:extracted-media/media/image34.png[Interfaz de usuario gráfica Descripción generada automáticamente,width=461,height=264]
+
+Se configura usar hashes SHA256 y verificar origen y destino tras la adquisición, para verificar que la copia obtenida es idéntica a la información original.
+
+Se solicita al Notario que conste en acta la foto donde se muestra toda la información de la extracción.
+
+Se inicia el proceso de volcado de disco.
+
+.Proceso de volcado en ejecución
+image:extracted-media/media/image35.png[Interfaz de usuario gráfica, Texto, Aplicación, Correo electrónico Descripción generada automáticamente,width=604,height=214]
+
+Se indica al Notario que conste en acta que el proceso de volcado se ha iniciado y que el tiempo estimado para completarse es el mostrado en la pantalla (1 hora y 26 minutos).
+
+El notario decide cerrar y sellar la sala donde se está realizando el volcado y volver más tarde.
+
+Transcurrido el tiempo establecido, se verifica que el proceso se ha completado con éxito. Se muestra el contenido de la carpeta de evidencias y se observa que se han generado 79 ficheros de evidencias y un fichero con extensión “.info” que contiene el resumen de la adquisición.
+
+Se muestra el contenido de dicho fichero. Y se observa que se muestra la siguiente información:
+
+* Datos identificativos del disco adquirido, que coinciden con los anotados en los pasos anteriores
+* Datos identificativos de la extracción, que coinciden con los introducidos por el perito en la pantalla de información de la extracción
+* Fechas y hora de inicio y fin del volcado
+* Tres hashes SH256 que se corresponden con los siguientes:
+** Hash calculado a medida que se leía la información del origen y se escribía en el destino
+** Hash calculado sobre el dispositivo original tras completar el volcado. Sirve para verificar que la información no se ha modificado durante el proceso de volcado.
+** Hash calculado sobre la copia escrita en el disco de evidencias, una vez completado el volcado. Sirve para verificar que la copia es correcta y no ha habido ningún error de escritura.
+* Se verifica que los tres hashes coinciden, por lo que se puede garantizar sin lugar a duda que la copia es idéntica a la información original.
+* El hash calculado en los tres casos es el siguiente:
+** 3d721f377c955cd12d6fdfbe9a74ec541f964e91d374bde266c499f5ed52cfbd
+
+.Información del volcado
+image:extracted-media/media/image36.png[Texto, Escala de tiempo Descripción generada automáticamente,width=519,height=319]
+
+Se solicita al Notario que conste en acta que los tres hashes mostrados es el mismo, y que se incluya la foto y el resultado del hash SHA256.
+
+==== Cálculo de hashes y sello de tiempo
+
+Se procede a calcular y documentar los hashes individuales de los ficheros de evidencia obtenidos.
+
+Se utiliza la utilidad sha256sum para calcular los hashes de los ficheros contenidos en la carpeta de evidencias adquiridas, y se vuelca el resultado a un fichero sha256sum.txt.
+
+Los hashes individuales de los ficheros deben constar en acta notarial, pero debido a que son 79 ficheros no es viable transcribirlos desde la fotografía. Terminado el proceso, se le copiará al notario el fichero de hashes, desde la copia del perito, para que consten en el acta notarial.
+
+.Cálculo de hashes sha256 de las evidencias
+image:extracted-media/media/image37.png[Texto Descripción generada automáticamente,width=604,height=229]
+
+Una vez que se completa el cálculo de los hashes, se procede a obtener el sello de tiempo de estos. Hay que recordar que para que esta fase se complete correctamente, el equipo debe tener conexión a Internet.
+
+Se activa la opción de compartir Internet del teléfono móvil del perito, y se configura la WIFI en el entorno forense para conectarse a la red WIFI del perito.
+
+Una vez conectado, se procede a obtener el sello de tiempo del fichero de hashes.
+
+.Sello de tiempo del fichero de hashes
+image:extracted-media/media/image38.png[Texto Descripción generada automáticamente,width=604,height=195]
+
+Se solicita al Notario que conste en acta la fecha y hora en que se ha obtenido el sello de tiempo y se desactiva la WIFI del entorno forense.
+
+Llegados a este punto, ya se cuenta con una copia indubitada de la información contenida en el disco duro del equipo, y se tiene la certeza absoluta de que se puede detectar cualquier manipulación sobre la misma.
+
+==== Copia para el perito
+
+Puesto que el disco en el que están las evidencias quedará en custodia del Notario, y el perito necesita una copia para su análisis, el último paso es copiar las evidencia obtenidos a un disco preparado a tal efecto, y etiquetado como “copia del perito”.
+
+Antes de conectar dicho disco, y para evitar suspicacias, se desmonta la partición de evidencias y se vuelve a montar en sólo lectura, puesto que ya no es necesario escribir en esa partición.
+
+Se monta el disco del perito en lectura escritura y se muestra la información de particiones para que quede claro que la partición de evidencias está montada en sólo lectura y el disco del perito en lectura/escritora, por lo que la información sólo puede ir de la partición de evidencias al disco del perito, y no al revés.
+
+.Estado de las particiones montadas
+image:extracted-media/media/image39.png[Texto Descripción generada automáticamente,width=521,height=321]
+
+Se solicita al Notario que conste en acta la foto de este importante detalle.
+
+Se procede a copiar las evidencias al disco del perito.
+
+.Proceso de copia de las evidencias al disco del perito
+image:extracted-media/media/image40.png[Interfaz de usuario gráfica, Texto Descripción generada automáticamente,width=474,height=266]
+
+Una vez que se completa el proceso de copia, se desmonta y se desconecta el disco del perito.
+
+==== Finalización y entrega del disco forense al Notario
+
+Para evitar borrados accidentales de la partición de persistencia, antes de parar el entorno forense, se protege la partición de persistencia.
+
+.Protección partición persistencia
+image:extracted-media/media/image41.png[Imagen que contiene electrónica, computadora Descripción generada automáticamente,width=499,height=315]
+
+Se realiza una parada limpia del entorno y se apaga el equipo.
+
+Se entrega al Notario el disco forense para su custodia. Se solicita al Notario que conste en acta que el único dispositivo que ha estado conectado al equipo es el que queda bajo su custodia.
+
+Desde la copia del perito, se facilita al notario el fichero sha256sum.txt de las evidencias para que haga constar en acta todos los hashes.
+
+Llegados a este punto, se ha completado el proceso de adquisición forense.
+

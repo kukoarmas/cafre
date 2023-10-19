@@ -1,0 +1,15 @@
+extends: default
+page:
+  layout: portrait
+  margin: [0.75in, 1in, 0.75in, 1in]
+  size: A4
+title-page:
+  logo:
+    image: image:images/Canarytek.png[align=center]
+footer:
+  recto:
+    left:
+      content: image:images/logo_ctk.png[width="75"]
+  verso:
+    right:
+      content: image:images/logo_ctk.png[width="75"]
